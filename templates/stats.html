@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>Data Statistics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Data Cleaning Statistics</h1>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">{{ total_records }}</div>
+                <div class="stat-label">Total Records</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">${{ "%.2f"|format(total_revenue) }}</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ total_quantity }}</div>
+                <div class="stat-label">Total Quantity</div>
+            </div>
+        </div>
+
+        <div style="padding: 20px;">
+            <h2>Top Products by Sales Count</h2>
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>Product</th>
+                        <th>Sales Count</th>
+                        <th>Percentage</th>
+                    </tr>
+                    {% for product, count in product_counts %}
+                    <tr>
+                        <td>{{ product }}</td>
+                            <td class="numeric">{{ count }}</td>
+                                <td class="numeric">
+                                    {% if total_quantity and total_quantity > 0 %}
+                                    {{ "%.1f"|format(count / total_quantity * 100) }}%
+                                {% else %}
+                                    0.0%
+                                {% endif %}
+                                </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="/" class="btn">← Back to Comparison</a>
+            <a href="/" class="btn btn-secondary">Refresh Data</a>
+        </div>
+    </div>
+</body>
+</html>

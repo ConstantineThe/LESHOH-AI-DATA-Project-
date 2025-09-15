@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>Data Comparison Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Data Quality Comparison Tool</h1>
+            <p>Original vs Cleaned Data Visualization</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.original_count }}</div>
+                <div class="stat-label">Original Rows</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.cleaned_count }}</div>
+                <div class="stat-label">Cleaned Rows</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.rows_removed }}</div>
+                <div class="stat-label">Rows Removed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.cleaning_percentage }}%</div>
+                <div class="stat-label">Data Reduction</div>
+            </div>
+        </div>
+
+        <div class="tables-container">
+            <!-- Original Table -->
+            <div class="table-section">
+                <div class="table-header">Original Data (First 108 rows)</div>
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            {% for col in columns %}
+                            <th>{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for row in rows %}
+                        <tr class="{% if row.is_dropped %}dropped{% endif %}">
+                            <td class="numeric">{{ row.row_number }}</td>
+                            {% for col in columns %}
+                            <td class="{% if col in ['price_per_unit', 'total_price'] %}currency{% endif %}
+                                      {% if col in ['quantity'] %}numeric{% endif %}
+                                      {% if row.diffs and col in row.diffs %}changed{% endif %}">
+                                {% if row.original and row.original[col] %}
+                                    {% if col in ['price_per_unit', 'total_price'] %}
+                                        {{ format_currency(row.original[col]) }}
+                                    {% else %}
+                                        {{ row.original[col] }}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cleaned Table -->
+            <div class="table-section">
+                <div class="table-header">Cleaned Data (First 108 rows)</div>
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            {% for col in columns %}
+                            <th>{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for row in rows %}
+                        <tr>
+                            <td class="numeric">{{ row.row_number }}</td>
+                            {% for col in columns %}
+                            <td class="{% if col in ['price_per_unit', 'total_price'] %}currency{% endif %}
+                                      {% if col in ['quantity'] %}numeric{% endif %}
+                                      {% if row.diffs and col in row.diffs %}changed{% endif %}">
+                                {% if row.cleaned and row.cleaned[col] %}
+                                    {% if col in ['price_per_unit', 'total_price'] %}
+                                        {{ format_currency(row.cleaned[col]) }}
+                                    {% else %}
+                                        {{ row.cleaned[col] }}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="/stats" class="btn">View Statistics →</a>
+            <a href="/" class="btn btn-secondary">Refresh Data</a>
+        </div>
+
+<div class="legend">
+    <h3>Legend</h3>
+    <div class="legend-items">
+        <div class="legend-item">
+            <div class="legend-color legend-dropped"></div>
+            <span>Dropped row</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-changed"></div>
+            <span>Changed value</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-currency">$123.45</span>
+            <span>Currency values</span>
+        </div>
+        <div class="legend-item">
+            <span style="font-weight: 600; color: #e65100;">↴</span>
+            <span>Changed cell indicator</span>
+        </div>
+    </div>
+   </div>
+</div>
+</body>
+</html>
